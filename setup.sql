@@ -41,7 +41,7 @@ create secret twelve_labs_api
   TYPE = GENERIC_STRING
   SECRET_STRING = 'tlk_XXXXXXXXXXXXXXXXXX';
 
-grant all on secret twelve_labs_api TO ROLE DASH_CONTAINER_RUNTIME_ROLE;
+grant all on secret twelve_labs_api to role DASH_CONTAINER_RUNTIME_ROLE;
   
 create network rule twelvelabs_network_rule
   MODE = EGRESS

@@ -1,5 +1,5 @@
 id: ai-video-search-with-snowflake-and-twelveLabs
-summary: Getting Started with Data Engineering and ML using Snowpark for Python and Snowflake Notebooks
+summary: This guide outlines the process for creating a video search and summarization workflow in Snowflake Notebook on Container Runtime.
 categories: featured,getting-started,data-science-&-ml,data-engineering,app-development
 environments: web
 status: Published
@@ -7,7 +7,7 @@ feedback link: <https://github.com/Snowflake-Labs/sfguides/issues>
 tags: Getting Started, Snowpark Python, Streamlit, Data-Science-&-Ai, Featured
 authors: Dash Desai
 
-# AI Video Search with Snowflake and TwelveLabs
+# AI Video Search with Snowflake and Twelve Labs
 <!-- ------------------------ -->
 
 ## Overview
@@ -26,15 +26,11 @@ Learn more about [Container Runtime](https://docs.snowflake.com/en/user-guide/ui
 
 Twelve Labs is a platform that provides AI-powered video understanding tools. It enables developers to extract meaningful insights from video content by creating embeddings that represent visual and audio features, allowing for advanced search, categorization, and analysis. With APIs for generating embeddings and querying them for similarity, Twelve Labs is ideal for tasks like content-based retrieval, scene detection, and semantic search in videos. It integrates seamlessly into workflows, making it easier to process and analyze large-scale video data efficiently.
 
-Learn more about [Snowflake Cortex](https://docs.snowflake.com/en/user-guide/snowflake-cortex/overview).
+Learn more about [Twelve Labs](https://www.twelvelabs.io/).
 
 ### What is Snowflake Cortex? 
 
-Snowflake Cortex is an intelligent, fully managed service that offers machine learning and AI solutions to Snowflake users. Snowflake Cortex capabilities include:
-
-LLM Functions: SQL and Python functions that leverage large language models (LLMs) for understanding, querying, translating, summarizing, and generating free-form text.
-
-ML Functions: SQL functions that perform predictive analysis such as forecasting and anomaly detection using machine learning to help you gain insights into your structured data and accelerate everyday analytics.
+Snowflake Cortex is a suite of AI features that use large language models (LLMs) to understand unstructured data, answer freeform questions, and provide intelligent assistance.
 
 Learn more about [Snowflake Cortex](https://docs.snowflake.com/en/user-guide/snowflake-cortex/overview).
 
@@ -48,7 +44,7 @@ Learn more about [Whisper](https://openai.com/index/whisper/).
 
 * Access to a [Snowflake account](https://signup.snowflake.com/) with ACCOUNTADMIN role.
 * Access to a [Twelve Labs account and API key](https://api.twelvelabs.io).
-* Access to video(s) uploaded to a publicly accessible URL. *NOTE: In this demo the videos have been uploaded to AWS S3.*
+* Access to video(s) uploaded to a publicly accessible URL. *NOTE: In this guide, a sample video uploaded to AWS S3 has been provided.*
 
 ## What You Will Learn
 
@@ -61,7 +57,7 @@ Learn more about [Whisper](https://openai.com/index/whisper/).
 
 ### What You Will Build
 
-An interactive Snowflake Notebook on Container Runtime running in Snowflake.
+A interactive AI videos processing and search app using Twelve Labs, Whisper, and Snowflake Cortex in Snowflake Notebook on Container Runtime running in Snowflake.
 
 <!-- ------------------------ -->
 ## Setup
@@ -96,24 +92,25 @@ Step 5. Open Notebook
 * Click on **Save** button
 * Click on **Start** button on top right
 
-NOTE: At this point, the container service will take about 5-7 minutes to start. You will not be able to proceed unless the status changes from **Starting** to **Active**.
+> aside positive
+> NOTE: At this point, the container service will take about 5-7 minutes to start. You will not be able to proceed unless the status changes from **Starting** to **Active**.
 
 <!-- ------------------------ -->
 ## Run Notebook
 
 Duration: 15
 
-* Cell 1: Install libraries
+* Cell 1: Install Python packages and other libraries
 
-* Cell 2: Import liraries
+* Cell 2: Import installed libraries
 
-* Cell 3: Videos list. This is where we provide a list of publicly accessible URLs.
+* Cell 3: This is where we provide a list of publicly accessible URLs of videos.  *NOTE: In this guide, a sample video uploaded to AWS S3 has been provided.*
 
 * Cell 4: Create and register `create_video_embeddings` Snowpark Python User Defined Table Function (UDTF) for creating embeddings for the videos using Twelve Labs
 
 * Cell 5: Create a Snowpark DataFrame using the list of videos and for each video call `create_video_embeddings` UDTF to generate embeddings. Note that the parallel processing of each video is achieved by `.over(partition_by="url")`. Then, save those embeddings in a Snowflake table called `video_embeddings`
 
-* Cell 6: Download open source `whisper` model and define Python functions:
+* Cell 6: Download open source `whisper` model and define the following Python functions:
     * download_video_from_s3
     * extract_audio_from_video
     * transcribe_with_whisper
@@ -139,7 +136,7 @@ Where;
 
 Duration: 1
 
-Congratulations! You've successfully created a multimodal AI videos processing app using Twelve Labs, Whisper, and Snowflake Cortex in Snowflake Notebook on Container Runtime. 
+Congratulations! You've successfully created a interactive AI videos processing and search app using Twelve Labs, Whisper, and Snowflake Cortex in Snowflake Notebook on Container Runtime running in Snowflake.
 
 ### What You Learned
 
