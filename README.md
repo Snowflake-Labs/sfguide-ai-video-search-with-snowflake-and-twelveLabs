@@ -123,11 +123,11 @@ Duration: 15
 
 ### Search Examples
 
-Search text: `snowflake intellegence`
+Search text: `snowflake intelligence`
 
-![Search blender foundation](search_snowflake_intellegence.png)
+![Search blender foundation](search_snowflake_intelligence.png)
 
-![Clip snowflake intellegence](clip_snowflake_intellegence.png)
+![Clip snowflake intelligence](clip_snowflake_intelligence.png)
 
 ---
 
