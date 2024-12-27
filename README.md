@@ -14,7 +14,7 @@ authors: Dash Desai
 
 Duration: 5
 
-This guide outlines the process for creating a video search and summarization workflow in Snowflake Notebook on Container Runtime. Videos stored in an S3 bucket are processed to generate embeddings using the Twelve Labs API, with parallelization achieved through a Snowpark Python User Defined Table Function (UDTF). These embeddings are stored in a Snowflake table using the VECTOR datatype, enabling efficient similarity searches with VECTOR_COSINE_SIMILARITY. Text queries are converted into embeddings using the same API to find the top N matching video clips. Audio from these clips is extracted using MoviePy and transcribed with Whisper. Finally, Cortex Complete is used to summarize the results, including video details, timestamps, and transcripts.
+This guide outlines the process for creating a video search and summarization workflow in Snowflake Notebook on Container Runtime. Videos stored in the cloud storage are processed to generate embeddings using the Twelve Labs API, with parallelization achieved through a Snowpark Python User Defined Table Function (UDTF). These embeddings are stored in a Snowflake table using the VECTOR datatype, enabling efficient similarity searches with VECTOR_COSINE_SIMILARITY. Text queries are converted into embeddings using the same API to find the top N matching video clips. Audio from these clips is extracted using MoviePy and transcribed with Whisper. Finally, Cortex Complete is used to summarize the results, including video details, timestamps, and transcripts.
 
 ### What is Container Runtime? 
 
@@ -44,11 +44,11 @@ Learn more about [Whisper](https://openai.com/index/whisper/).
 
 * Access to a [Snowflake account](https://signup.snowflake.com/) with ACCOUNTADMIN role.
 * Access to a [Twelve Labs account and API key](https://api.twelvelabs.io).
-* Access to video(s) uploaded to a publicly accessible URL. *NOTE: In this guide, a sample video uploaded to AWS S3 has been provided.*
+* Access to video(s) uploaded to a publicly accessible URL. *NOTE: In this guide, three sample videos have been provided.*
 
 ## What You Will Learn
 
-* **Generate Video Embeddings**: Use the Twelve Labs API to create embeddings for videos stored in an S3 bucket.
+* **Generate Video Embeddings**: Use the Twelve Labs API to create embeddings for videos stored in the cloud storage.
 * **Parallel Processing**: Leverage a Python UDTF to process the videos in parallel.
 * **Store Embeddings**: Save the video embeddings in a Snowflake table using the VECTOR datatype.
 * **Similarity Search**: Use VECTOR_COSINE_SIMILARITY to find the top *N* matching clips for a given text query. The query is converted into embeddings via the Twelve Labs API.
@@ -104,14 +104,14 @@ Duration: 15
 
 * Cell 2: Import installed libraries
 
-* Cell 3: This is where we provide a list of publicly accessible URLs of videos.  *NOTE: In this guide, a sample video uploaded to AWS S3 has been provided.*
+* Cell 3: This is where we provide a list of publicly accessible URLs of videos.  *NOTE: In this guide, three sample videos have been provided.*
 
 * Cell 4: Create and register `create_video_embeddings` Snowpark Python User Defined Table Function (UDTF) for creating embeddings for the videos using Twelve Labs
 
 * Cell 5: Create a Snowpark DataFrame using the list of videos and for each video call `create_video_embeddings` UDTF to generate embeddings. Note that the parallel processing of each video is achieved by `.over(partition_by="url")`. Then, save those embeddings in a Snowflake table called `video_embeddings`
 
 * Cell 6: Download open source `whisper` model and define the following Python functions:
-    * download_video_from_s3
+    * download_video
     * extract_audio_from_video
     * transcribe_with_whisper
     * transcribe_video
@@ -121,17 +121,37 @@ Duration: 15
 
 * Cell 8: Streamlit application that takes search text, max results, and an LLM as input. Then, it first calls `similarity_scores` function to get top *N* video clip records along with their similarity scores. For each clip, it then calls `transcribe_video_clip` function passing in its VIDEO_URL, START_OFFSET_SEC, END_OFFSET_SEC to generate the clip transcription. Finally, it calls `snowflake.cortex.Complete` to summarize the output.
 
-### Search Example
+### Search Examples
 
-For example, if you were to enter "hybrid tables" and left everything else to the default values, you should see output similar to the following after you click on **Search and Summarize Matching Video Clips** button.
+Search text: `snowflake intellegence`
 
-![Search Clip App](search_clip_app.png)
+![Search blender foundation](search_snowflake_intellegence.png)
+
+![Clip snowflake intellegence](clip_snowflake_intellegence.png)
+
+---
+
+Search text: `blender foundation`
+
+![Search blender foundation](search_blender_foundation.png)
+
+![Clip blender foundation](clip_blender_foundation.png)
+
+---
+
+Search text: `bunny`
+
+![Search bunny](search_bunny.png)
+
+![Clip blender foundation](clip_bunny.png)
+
+---
 
 Notice the following: 
 
-It displays the URL fo the video, the clip start and end times, similarity score generated by VECTOR_COSINE_SIMILARITY, clip transcript generated by open source whisper model, as well as the summary generated by Snowflake Cortex. AWESOME!
+For all search results, it displays the URL of the video, the clip start and end times, similarity score generated by VECTOR_COSINE_SIMILARITY, clip transcript generated by open source whisper model, as well as the summary generated by Snowflake Cortex. So AWESOME!
 
-Feel free to play around with different search text, LLM models, and also try it with your own videos.
+Feel free to play around with different search texts, LLM models, and also try it out with your own videos.
 
 <!-- ------------------------ -->
 ## Conclusion And Resources
@@ -142,7 +162,7 @@ Congratulations! You've successfully created a interactive AI videos processing 
 
 ### What You Learned
 
-* Generate Video Embeddings: Use the Twelve Labs API to create embeddings for videos stored in an S3 bucket.
+* Generate Video Embeddings: Use the Twelve Labs API to create embeddings for videos stored in the cloud storage.
 * Parallel Processing: Leverage a Python UDTF to process the videos in parallel.
 * Store Embeddings: Save the video embeddings in a Snowflake table using the VECTOR datatype.
 * Similarity Search: Use VECTOR_COSINE_SIMILARITY to find the top *N* matching clips for a given text query. The query is converted into embeddings via the Twelve Labs API.
