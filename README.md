@@ -6,4 +6,4 @@ This guide outlines the process for creating a video search and summarization wo
 
 ## Step-By-Step Guide
 
-For prerequisites, environment setup, step-by-step guide and instructions, please refer to the [QuickStart Guide](https://quickstarts.snowflake.com/guide/ai_video_search_with_snowflake_and_twelveLabs/index.html).
+For prerequisites, environment setup, step-by-step guide and instructions, please refer to the [QuickStart Guide](https://quickstarts.snowflake.com/guide/ai-video-search-with-snowflake-and-twelveLabs/index.html).
