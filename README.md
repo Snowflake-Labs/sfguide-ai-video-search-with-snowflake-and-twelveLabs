@@ -12,7 +12,7 @@ authors: Dash Desai
 
 ## Overview
 
-Duration: 5
+Duration: 4
 
 This guide outlines the process for creating a video search and summarization workflow in Snowflake Notebook on Container Runtime. Videos stored in the cloud storage are processed to generate embeddings using the Twelve Labs API, with parallelization achieved through a Snowpark Python User Defined Table Function (UDTF). These embeddings are stored in a Snowflake table using the VECTOR datatype, enabling efficient similarity searches with VECTOR_COSINE_SIMILARITY. Text queries are converted into embeddings using the same API to find the top N matching video clips. Audio from these clips is extracted using MoviePy and transcribed with Whisper. Finally, Cortex Complete is used to summarize the results, including video details, timestamps, and transcripts.
 
@@ -34,7 +34,7 @@ Snowflake Cortex is a suite of AI features that use large language models (LLMs)
 
 Learn more about [Snowflake Cortex](https://docs.snowflake.com/en/user-guide/snowflake-cortex/overview).
 
-## What is Whisper? 
+### What is Whisper? 
 
 OpenAI’s Whisper is an open-source automatic speech recognition (ASR) model designed for high-quality transcription and translation of spoken language. Trained on diverse multilingual data, it handles various languages, accents, and challenging audio conditions like background noise. Whisper supports transcription, language detection, and translation to English, making it versatile for applications such as subtitles, accessibility tools, and voice interfaces. Available in multiple model sizes, it balances performance and resource needs, enabling seamless integration into real-world projects.
 
@@ -43,10 +43,13 @@ Learn more about [Whisper](https://openai.com/index/whisper/).
 ### Prerequisites
 
 * Access to a [Snowflake account](https://signup.snowflake.com/) with ACCOUNTADMIN role.
-* Access to a [Twelve Labs account and API key](https://api.twelvelabs.io).
-* Access to video(s) uploaded to a publicly accessible URL. *NOTE: In this guide, three sample videos have been provided.*
+* Access to a [Twelve Labs account and API key](https://www.twelvelabs.io/).
+* Access to video(s) uploaded to a publicly accessible URL.
 
-## What You Will Learn
+> aside positive
+> NOTE: In this guide, three sample videos have been provided.
+
+### What You Will Learn
 
 * **Generate Video Embeddings**: Use the Twelve Labs API to create embeddings for videos stored in the cloud storage.
 * **Parallel Processing**: Leverage a Python UDTF to process the videos in parallel.
@@ -64,13 +67,13 @@ AI videos processing and search app using Twelve Labs, Whisper, Streamlit, and S
 
 Duration: 10 
 
-Step 1. In Snowsight, [create a SQL Worksheet](https://docs.snowflake.com/en/user-guide/ui-snowsight-worksheets-gs?_fsi=THrZMtDg,%20THrZMtDg&_fsi=THrZMtDg,%20THrZMtDg#create-worksheets-from-a-sql-file) and open [setup.sql](https://github.com/Snowflake-Labs/sfguide-ai-video-search-with-snowflake-and-twelveLabs/blob/main/setup.sql) to execute all statements in order from top to bottom.
+**Step 1.** In Snowsight, [create a SQL Worksheet](https://docs.snowflake.com/en/user-guide/ui-snowsight-worksheets-gs?_fsi=THrZMtDg,%20THrZMtDg&_fsi=THrZMtDg,%20THrZMtDg#create-worksheets-from-a-sql-file) and open [setup.sql](https://github.com/Snowflake-Labs/sfguide-ai-video-search-with-snowflake-and-twelveLabs/blob/main/setup.sql) to execute all statements in order from top to bottom.
 
-Step 2. In Snowsight, switch your user role to `DASH_CONTAINER_RUNTIME_ROLE`.
+**Step 2.** In Snowsight, switch your user role to `DASH_CONTAINER_RUNTIME_ROLE`.
 
-Step 3. Click on [Gen_AI_Video_Search.ipynb](https://github.com/Snowflake-Labs/sfguide-ai-video-search-with-snowflake-and-twelveLabs/blob/main/Gen_AI_Video_Search.ipynb) to download the Notebook from GitHub. (NOTE: Do NOT right-click to download.)
+**Step 3.** Click on [Gen_AI_Video_Search.ipynb](https://github.com/Snowflake-Labs/sfguide-ai-video-search-with-snowflake-and-twelveLabs/blob/main/Gen_AI_Video_Search.ipynb) to download the Notebook from GitHub. (NOTE: Do NOT right-click to download.)
 
-Step 4. In Snowsight:
+**Step 4.** In Snowsight:
 
 * On the left hand navigation menu, click on **Projects » Notebooks**
 * On the top right, click on **Notebook** down arrow and select **Import .ipynb file** from the dropdown menu
@@ -85,7 +88,7 @@ Step 4. In Snowsight:
 
 <!-- ![Create Notebook](create_notebook.png) -->
 
-Step 5. Open Notebook
+**Step 5.** Open Notebook
 
 * Click in the three dots at the very top-right corner and select `Notebook settings` >> `External access`
 * Turn on **ALLOW_ALL_ACCESS_INTEGRATION**
@@ -100,30 +103,36 @@ Step 5. Open Notebook
 
 Duration: 15
 
-* Cell 1: Install Python packages and other libraries
+**Cell 1:** Install Python packages and other libraries
 
-* Cell 2: Import installed libraries
+**Cell 2:** Import installed libraries
 
-* Cell 3: This is where we provide a list of publicly accessible URLs of videos.  *NOTE: In this guide, three sample videos have been provided.*
+**Cell 3:** This is where we provide a list of publicly accessible URLs of videos.  *NOTE: In this guide, three sample videos have been provided.*
 
-* Cell 4: Create and register `create_video_embeddings` Snowpark Python User Defined Table Function (UDTF) for creating embeddings for the videos using Twelve Labs
+**Cell 4:** Create and register `create_video_embeddings` Snowpark Python User Defined Table Function (UDTF) for creating embeddings for the videos using Twelve Labs
 
-* Cell 5: Create a Snowpark DataFrame using the list of videos and for each video call `create_video_embeddings` UDTF to generate embeddings. Note that the parallel processing of each video is achieved by `.over(partition_by="url")`. Then, save those embeddings in a Snowflake table called `video_embeddings`
+**Cell 5:** Create a Snowpark DataFrame using the list of videos and for each video call `create_video_embeddings` UDTF to generate embeddings. Note that the parallel processing of each video is achieved by `.over(partition_by="url")`. Then, save those embeddings in a Snowflake table called `video_embeddings`
 
-* Cell 6: Download open source `whisper` model and define the following Python functions:
+**Cell 6:** Download open source `whisper` model and define the following Python functions:
     * download_video
     * extract_audio_from_video
     * transcribe_with_whisper
     * transcribe_video
     * transcribe_video_clip
 
-* Cell 7: Replace `tlk_XXXXXXXXXXXXXXXXXX` with your Twelve Labs API Key. Here we define Python function `similarity_scores` that uses Twelve Labs to create embeddings for a given text -- *entered_text* passed in as a parameter. Then, similarity scores are generated using Snowflake function **VECTOR_COSINE_SIMILARITY** between text embeddings and video embeddings stored in `video_embeddings` table. This function returns top *N* records (based on *max_results* passed in as a parameter) with columns VIDEO_URL, START_OFFSET_SEC, END_OFFSET_SEC, and SIMILARITY_SCORE
+**Cell 7:** Replace `tlk_XXXXXXXXXXXXXXXXXX` with your Twelve Labs API Key. Here we define Python function `similarity_scores` that uses Twelve Labs to create embeddings for a given text -- *entered_text* passed in as a parameter. Then, similarity scores are generated using Snowflake function **VECTOR_COSINE_SIMILARITY** between text embeddings and video embeddings stored in `video_embeddings` table. This function returns top *N* records (based on *max_results* passed in as a parameter) with columns VIDEO_URL, START_OFFSET_SEC, END_OFFSET_SEC, and SIMILARITY_SCORE
 
-* Cell 8: Streamlit application that takes search text, max results, and an LLM as input. Then, it first calls `similarity_scores` function to get top *N* video clip records along with their similarity scores. For each clip, it then calls `transcribe_video_clip` function passing in its VIDEO_URL, START_OFFSET_SEC, END_OFFSET_SEC to generate the clip transcription. Finally, it calls `snowflake.cortex.Complete` to summarize the output.
+**Cell 8:** Streamlit application that takes **Search Text**, **Max Results**, and **Summary LLM** as user input. Then, it first calls `similarity_scores` function to get top *N* video clip records along with their similarity scores. For each clip, it then calls `transcribe_video_clip` function passing in its VIDEO_URL, START_OFFSET_SEC, END_OFFSET_SEC to generate the clip transcription. Finally, it calls `snowflake.cortex.Complete` to summarize the output.
 
 ### Search Examples
 
-Search text: `snowflake intelligence`
+For all search results, the app displays the URL of the video, the clip start and end times, similarity score generated by VECTOR_COSINE_SIMILARITY, clip transcript generated by open source whisper model, as well as the summary generated by Snowflake Cortex.
+
+In all of the following examples, notice the highlighted clip start and end times as well as the timestamps in the respective videos.
+
+#### Example 1
+
+**Search text**: `snowflake intelligence`
 
 ![Search blender foundation](search_snowflake_intelligence.png)
 
@@ -131,7 +140,9 @@ Search text: `snowflake intelligence`
 
 ---
 
-Search text: `blender foundation`
+#### Example 2
+
+**Search text**: `blender foundation`
 
 ![Search blender foundation](search_blender_foundation.png)
 
@@ -139,7 +150,9 @@ Search text: `blender foundation`
 
 ---
 
-Search text: `bunny`
+#### Example 3
+
+**Search text**: `bunny`
 
 ![Search bunny](search_bunny.png)
 
@@ -147,11 +160,7 @@ Search text: `bunny`
 
 ---
 
-Notice the following: 
-
-For all search results, it displays the URL of the video, the clip start and end times, similarity score generated by VECTOR_COSINE_SIMILARITY, clip transcript generated by open source whisper model, as well as the summary generated by Snowflake Cortex. So AWESOME!
-
-Feel free to play around with different search texts, LLM models, and also try it out with your own videos.
+So AWESOME! Feel free to play around with different search texts, LLM models, and also try it out with your own videos.
 
 <!-- ------------------------ -->
 ## Conclusion And Resources
@@ -173,4 +182,3 @@ Congratulations! You've successfully created a interactive AI videos processing 
 
 - [GitHub Repo](https://github.com/Snowflake-Labs/sfguide-ai-video-search-with-snowflake-and-twelveLabs)
 - [Snowflake Notebooks on Container Runtime](https://docs.snowflake.com/en/user-guide/ui-snowsight/notebooks-on-spcs)
-
